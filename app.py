@@ -85,7 +85,7 @@ with tabs[2]:
     y_pred = model_pipeline.predict(X_test)
     m1, m2, m3= st.columns(3)
     mape = mean_absolute_percentage_error(y_test, y_pred)
-    m1.metric("Model Accuracy:", f"{1 - mape:.2%}")
+    m1.metric("Model Accuracy", f"{1 - mape:.2%}")
     m2.metric("R² Score (Variance Explained)", f"{r2_score(y_test, y_pred):.4f}")
     m3.metric("Mean Absolute Error", f"{mean_absolute_error(y_test, y_pred):.2f} pts")
     importances = model_pipeline.named_steps['regressor'].feature_importances_
