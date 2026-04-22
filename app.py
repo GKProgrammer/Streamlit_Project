@@ -89,3 +89,4 @@ with tabs[2]:
     feat_importances = pd.Series(importances[:len(numerical_cols)], index=numerical_cols)
     st.subheader("Key Economic Drivers")
     st.bar_chart(feat_importances)
+    st.metric("Model Accuracy: ", f"{100 * r2_score(y_test, y_pred):.4f}%")
