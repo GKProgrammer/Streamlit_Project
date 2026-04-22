@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 from sklearn.model_selection import train_test_split
@@ -8,7 +7,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_percentage_error
 st.set_page_config(layout="wide", page_title="Global Inflation Analytics")
 # --- Data Loading ---
 @st.cache_data
@@ -87,19 +86,11 @@ with tabs[2]:
 with tabs[2]:
     st.header("Model Performance")
     y_pred = model_pipeline.predict(X_test)
-    m1, m2 = st.columns(2)
-    m1.metric("R² Score (Variance Explained)", f"{r2_score(y_test, y_pred):.4f}")
-    m2.metric("Mean Absolute Error", f"{mean_absolute_error(y_test, y_pred):.2f} pts")
-    st.divider()
-    st.subheader("Threshold Accuracy")
-    st.write("What percentage of our predictions fall within an acceptable margin of error?")
-    tolerance = st.slider("Acceptable Error Margin (± % points)", min_value=0.1, max_value=2.0, value=0.5, step=0.1)
-    absolute_errors = np.abs(y_test - y_pred)
-    correct_predictions = np.sum(absolute_errors <= tolerance)
-    total_predictions = len(y_test)
-    threshold_accuracy = (correct_predictions / total_predictions) * 100
-    st.metric(f"Accuracy (within ±{tolerance}%)", f"{threshold_accuracy:.2f}%")
-    st.divider()
+    m1, m2, m3= st.columns(3)
+    mape = mean_absolute_percentage_error(y_test, y_pred)
+    m1.metric("Model Accuracy:", f"{1 - mape:.2%}")
+    m2.metric("R² Score (Variance Explained)", f"{r2_score(y_test, y_pred):.4f}")
+    m3.metric("Mean Absolute Error", f"{mean_absolute_error(y_test, y_pred):.2f} pts")
     importances = model_pipeline.named_steps['regressor'].feature_importances_
     feat_importances = pd.Series(importances[:len(numerical_cols)], index=numerical_cols)
     st.subheader("Key Economic Drivers")
