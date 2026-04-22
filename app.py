@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 from sklearn.model_selection import train_test_split
@@ -80,13 +81,26 @@ with tabs[1]:
     st.metric(label=f"Predicted Inflation for {p_country}", value=f"{prediction:.2f}%", delta_color="inverse")
 # --- Tab 3: Model Stats ---
 with tabs[2]:
+   import numpy as np # Make sure numpy is imported at the top of your file
+
+# --- Inside your Tab 3: Model Stats ---
+with tabs[2]:
     st.header("Model Performance")
     y_pred = model_pipeline.predict(X_test)
     m1, m2 = st.columns(2)
-    m1.metric("R² Score", f"{r2_score(y_test, y_pred):.4f}")
-    m2.metric("Mean Squared Error", f"{mean_squared_error(y_test, y_pred):.4f}")
+    m1.metric("R² Score (Variance Explained)", f"{r2_score(y_test, y_pred):.4f}")
+    m2.metric("Mean Absolute Error", f"{mean_absolute_error(y_test, y_pred):.2f} pts")
+    st.divider()
+    st.subheader("Threshold Accuracy")
+    st.write("What percentage of our predictions fall within an acceptable margin of error?")
+    tolerance = st.slider("Acceptable Error Margin (± % points)", min_value=0.1, max_value=2.0, value=0.5, step=0.1)
+    absolute_errors = np.abs(y_test - y_pred)
+    correct_predictions = np.sum(absolute_errors <= tolerance)
+    total_predictions = len(y_test)
+    threshold_accuracy = (correct_predictions / total_predictions) * 100
+    st.metric(f"Accuracy (within ±{tolerance}%)", f"{threshold_accuracy:.2f}%")
+    st.divider()
     importances = model_pipeline.named_steps['regressor'].feature_importances_
     feat_importances = pd.Series(importances[:len(numerical_cols)], index=numerical_cols)
     st.subheader("Key Economic Drivers")
     st.bar_chart(feat_importances)
-    st.metric("Model Accuracy: ", f"{100 * r2_score(y_test, y_pred):.4f}%")
