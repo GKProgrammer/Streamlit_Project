@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import kagglehub
+import numpy as np
 from kagglehub import KaggleDatasetAdapter
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -79,10 +80,6 @@ with tabs[1]:
     st.divider()
     st.metric(label=f"Predicted Inflation for {p_country}", value=f"{prediction:.2f}%", delta_color="inverse")
 # --- Tab 3: Model Stats ---
-with tabs[2]:
-   import numpy as np # Make sure numpy is imported at the top of your file
-
-# --- Inside your Tab 3: Model Stats ---
 with tabs[2]:
     st.header("Model Performance")
     y_pred = model_pipeline.predict(X_test)
